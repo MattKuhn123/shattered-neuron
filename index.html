@@ -21,7 +21,7 @@
                 <fieldset>
                     <legend>Force commitment</legend>
                     <label for="player-commit-forces">Forces</label>
-                    <input id="player-commit-forces" type="number" required>
+                    <input id="player-commit-forces" type="number" required oninput="this.setCustomValidity('')">
                 </fieldset>
                 <button>Commit</button>
             </form>

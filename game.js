@@ -11,7 +11,7 @@ getOpponentCommitForcesValue = () => Number(getOpponentCommitForcesElement().val
 getOpponentCommitForcesElement = () => document.querySelector("#opponent-commit-forces");
 
 getPlayerVictoriesValue = () => Number(getPlayerVictoriesElement().value);
-getPlayerVictoriesElement = () => document.querySelector("#opponent-victories");
+getPlayerVictoriesElement = () => document.querySelector("#player-victories");
 
 getOpponentVictoriesValue = () => Number(getOpponentVictoriesElement().value);
 getOpponentVictoriesElement = () => document.querySelector("#opponent-victories");
@@ -102,4 +102,3 @@ doOpponentAction = async (action) => {
         }, 1000);
     });
 }
-
