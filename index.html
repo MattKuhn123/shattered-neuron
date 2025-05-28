@@ -10,43 +10,38 @@
 
 <body>
     <main>
-        <section>
-            <h1>Board</h1>
-            <label for="player-victories">Victories: </label>
-            <output id="player-victories" class="input">0</output>
-            <label for="player-total-forces">Total forces</label>
-            <output id="player-total-forces" class="input">1000</output>
-            <form id="player-force-commitment" onsubmit="onSubmitPlayerForceCommitment(event)" >
-                <fieldset>
-                    <legend>Force commitment</legend>
-                    <label for="player-commit-forces">Forces</label>
-                    <input id="player-commit-forces" type="number" required oninput="this.setCustomValidity('')">
-                </fieldset>
-                <button>Commit</button>
-            </form>
-        </section>
-        <section>
-            <h1>Battle</h1>
-        </section>
-        <section>
-            <h1>Opponent Board</h1>
-            <label for="opponent-victories">Victories: </label>
-            <output id="opponent-victories" class="input">0</output>
-            <label for="opponent-total-forces">Opponent total forces</label>
-            <output id="opponent-total-forces" class="input">1000</output>
-            <form id="opponent-force-commitment">
+        <form class="center-content" onsubmit="onSubmitPlayerForceCommitment(event)">
+            <section>
+                <h1>Opponent Board</h1>
+                <label for="opponent-victories">Victories: </label>
+                <output id="opponent-victories" class="input">0</output>
+                <label for="opponent-total-forces">Opponent total forces</label>
+                <output id="opponent-total-forces" class="input">1000</output>
                 <fieldset>
                     <legend>Opponent force commitment</legend>
                     <label for="opponent-commit-forces">Forces</label>
                     <output id="opponent-commit-forces" class="input"></output>
                 </fieldset>
-            </form>
-            <samp id="opponent-actions"></samp>
-        </section>
+                <samp id="opponent-actions"></samp>
+            </section>
+            <section>
+                <h1>Board</h1>
+                <label for="player-victories">Victories: </label>
+                <output id="player-victories" class="input">0</output>
+                <label for="player-total-forces">Total forces</label>
+                <output id="player-total-forces" class="input">1000</output>
+                <fieldset>
+                    <legend>Force commitment</legend>
+                    <label for="player-commit-forces">Forces</label>
+                    <input id="player-commit-forces" type="number" name="player-commit-forces" required max="5">
+                </fieldset>
+                <button>Commit</button>
+            </section>
+            <aside>
+                <output id="outcome">output</output>
+            </aside>
+        </form>
     </main>
-    <footer class="center-content">
-        <output id="outcome">output</output>
-    </footer>
     <script src="./game.js"></script>
 </body>
 

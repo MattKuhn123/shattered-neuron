@@ -30,48 +30,39 @@ outcomeId = () => "outcome";
 opponentActionsId = () => "opponent-actions";
 
 onSubmitPlayerForceCommitment = async (event) => {
-    event.preventDefault();
-    doGameStep(doGameStepAttack());
+    await doGameStep(doGameStepAttack());
 }
 
 doGameStepAttack = () => {
     return {
         playerVictory: undefined,
-        validate: async () => {
-            const valid = val(playerCommitForcesId()) <= val(playerTotalForcesId());
-            elt(playerCommitForcesId()).setCustomValidity(valid ? "" : "You don't have those forces at your disposal, sir!");
-            elt(playerCommitForcesId()).reportValidity();
-            return valid;
+        pre: async () => {
+            await doOpponentAction(opponentActionAssignForces());
         },
         gameStep: async () => {
-            await doOpponentAction(opponentActionAssignForces());
-            this.playerVictory = val(playerCommitForcesId()) > val(opponentCommitForcesId());
-        },
-        post: async () => {
-            val(outcomeId(), this.playerVictory ? "Victory!" : "Defeat!");
-
             val(playerTotalForcesId(), val(playerTotalForcesId()) - val(playerCommitForcesId()));
             val(opponentTotalForcesId(), val(opponentTotalForcesId()) - val(opponentCommitForcesId()));
             val(playerCommitForcesId(), 0);
             val(opponentCommitForcesId(), 0);
-
+            
+            this.playerVictory = val(playerCommitForcesId()) > val(opponentCommitForcesId());
             if (this.playerVictory) {
                 val(playerVictoriesId(), val(playerVictoriesId())+1);
             } else {
                 val(opponentVictoriesId(), val(opponentVictoriesId())+1);
             }
+        },
+        post: async () => {
+            val(outcomeId(), this.playerVictory ? "Victory!" : "Defeat!");
         }
     }
 }
 
 doGameStep = async (gameStep) => {
-    if (!(await gameStep.validate())) {
-        return;
-    }
-    
     document.querySelectorAll("input").forEach(x => x.setAttribute("readonly", true));
     document.querySelectorAll("button").forEach(x => x.setAttribute("disabled", true));
 
+    await gameStep.pre();
     await gameStep.gameStep();
     await gameStep.post();
 
