@@ -13,10 +13,10 @@
         <section id="player-board">
             <section>
                 <label for="player-victories">Victories: </label>
-                <input id="player-victories" readonly>
+                <output id="player-victories" class="input">0</output>
             </section>
-            <label for=>Total forces</label>
-            <input id="player-total-forces" type="number" readonly value="1000">
+            <label for="player-total-forces">Total forces</label>
+            <output id="player-total-forces" class="input">1000</output>
             <form id="player-force-commitment" class="forces" onsubmit="playerForceCommitmentSubmit(event)" >
                 <fieldset>
                     <legend>Force commitment</legend>
@@ -29,15 +29,15 @@
         <section id="opponent=board">
             <section>
                 <label for="opponent-victories">Victories: </label>
-                <input id="opponent-victories" readonly>
+                <output id="opponent-victories" class="input">0</output>
             </section>
             <label for="opponent-total-forces">Opponent total forces</label>
-            <input id="opponent-total-forces" type="number" readonly value="1000">
+            <output id="opponent-total-forces" class="input"><samp>1000</samp></output>
             <form id="opponent-force-commitment" class="forces">
                 <fieldset>
                     <legend>Opponent force commitment</legend>
                     <label for="opponent-commit-forces">Forces</label>
-                    <input id="opponent-commit-forces" type="number" required readonly>
+                    <output id="opponent-commit-forces" class="input"></output>
                 </fieldset>
             </form>
             <samp id="opponent-actions"></samp>
