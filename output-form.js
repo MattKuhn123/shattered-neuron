@@ -7,7 +7,7 @@
  *   <output id="result">42</output>
 *    <button type="submit">Submit</button>
  * </form>
- * 
+ * ```
  */
 class OutputForm extends HTMLFormElement {
     connectedCallback() {
