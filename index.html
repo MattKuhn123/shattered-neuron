@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shattered Neuron</title>
+    <link href="./styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+    <main class="game-container">
+        <section id="player-board">
+            <section>
+                <label for="player-victories">Victories: </label>
+                <input id="player-victories" readonly>
+            </section>
+            <label for=>Total forces</label>
+            <input id="player-total-forces" type="number" readonly value="1000">
+            <form id="player-force-commitment" class="forces" onsubmit="playerForceCommitmentSubmit(event)" >
+                <fieldset>
+                    <legend>Force commitment</legend>
+                    <label for="player-commit-forces">Forces</label>
+                    <input id="player-commit-forces" type="number" required>
+                </fieldset>
+                <button>Commit</button>
+            </form>
+        </section>
+        <section id="opponent=board">
+            <section>
+                <label for="opponent-victories">Victories: </label>
+                <input id="opponent-victories" readonly>
+            </section>
+            <label for="opponent-total-forces">Opponent total forces</label>
+            <input id="opponent-total-forces" type="number" readonly value="1000">
+            <form id="opponent-force-commitment" class="forces">
+                <fieldset>
+                    <legend>Opponent force commitment</legend>
+                    <label for="opponent-commit-forces">Forces</label>
+                    <input id="opponent-commit-forces" type="number" required readonly>
+                </fieldset>
+            </form>
+            <samp id="opponent-actions"></samp>
+        </section>
+    </main>
+    <footer class="center-content">
+        <output id="outcome">output</output>
+    </footer>
+    <script src="./game.js"></script>
+</body>
+
+</html>
