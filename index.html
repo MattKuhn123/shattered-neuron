@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shattered Neuron</title>
     <link href="./styles.css" rel="stylesheet"/>
+    <script src="./output-form.js"></script>
 </head>
 
 <body>
     <main>
-        <form class="center-content" onsubmit="onSubmitPlayerForceCommitment(event)">
+        <form is="output-form" class="center-content">
             <section>
                 <h1>Opponent Board</h1>
                 <label for="opponent-victories">Victories: </label>
@@ -43,6 +44,13 @@
         </form>
     </main>
     <script src="./game.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+
+        // Example: Get the value of a parameter named "foo"
+        const fooValue = params.get('player-commit-forces');
+        console.log('foo:', fooValue);
+    </script>
 </body>
 
 </html>
