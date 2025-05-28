@@ -29,7 +29,7 @@ opponentVictoriesId = () => "opponent-victories";
 outcomeId = () => "outcome";
 opponentActionsId = () => "opponent-actions";
 
-playerForceCommitmentSubmit = async (event) => {
+onSubmitPlayerForceCommitment = async (event) => {
     event.preventDefault();
     doGameStep(doGameStepAttack());
 }
