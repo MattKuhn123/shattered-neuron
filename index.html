@@ -5,23 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shattered Neuron</title>
-    <link href="./styles.css" rel="stylesheet"/>
-    <script src="./output-form.js"></script>
+    <link href="./styles.css" rel="stylesheet" />
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js></script>
+    <script src="./formula-output.js"></script>
+    <script src="./submit-output-form.js"></script>
 </head>
 
 <body>
     <main>
-        <form is="output-form" class="center-content">
+        <form is="submit-output-form" class="center-content">
             <section>
                 <h1>Opponent Board</h1>
                 <label for="opponent-victories">Victories: </label>
                 <output id="opponent-victories" class="input">0</output>
                 <label for="opponent-total-forces">Opponent total forces</label>
-                <output id="opponent-total-forces" class="input">1000</output>
+                <output id="opponent-total-forces" name="opponent-total-forces" class="input">1000</output>
                 <fieldset>
                     <legend>Opponent force commitment</legend>
                     <label for="opponent-commit-forces">Forces</label>
-                    <output id="opponent-commit-forces" class="input"></output>
+                    <output id="opponent-commit-forces" name="opponent-commit-forces" class="input"></output>
                 </fieldset>
                 <samp id="opponent-actions"></samp>
             </section>
@@ -30,7 +32,7 @@
                 <label for="player-victories">Victories: </label>
                 <output id="player-victories" class="input">0</output>
                 <label for="player-total-forces">Total forces</label>
-                <output id="player-total-forces" class="input">1000</output>
+                <output id="player-total-forces" name="player-total-forces" class="input">1000</output>
                 <fieldset>
                     <legend>Force commitment</legend>
                     <label for="player-commit-forces">Forces</label>
@@ -43,7 +45,124 @@
             </aside>
         </form>
     </main>
-    <script src="./game.js"></script>
 </body>
+<script>
+    elt = (id) => {
+        return document.getElementById(id);
+    }
+
+    val = (id, value) => {
+        const x = elt(id);
+        if (value !== undefined) {
+            if (x.tagName.toLowerCase() === "input") {
+                x.value = value.toString();
+            } else {
+                x.textContent = value.toString();
+            }
+        } else {
+            if (x.tagName.toLowerCase() === "input") {
+                return Number(x.value);
+            } else {
+                return Number(x.textContent);
+            }
+        }
+
+    }
+
+    playerTotalForcesId = () => "player-total-forces";
+    opponentTotalForcesId = () => "opponent-total-forces";
+    playerCommitForcesId = () => "player-commit-forces";
+    opponentCommitForcesId = () => "opponent-commit-forces";
+    playerVictoriesId = () => "player-victories";
+    opponentVictoriesId = () => "opponent-victories";
+    outcomeId = () => "outcome";
+    opponentActionsId = () => "opponent-actions";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.size) {
+            return;
+        }
+
+        params.forEach((v, k) => val(k, v));
+        doGameStep(doGameStepAttack());
+    });
+
+    doGameStepAttack = () => {
+        return {
+            playerVictory: undefined,
+            pre: async () => {
+                await doOpponentAction(opponentActionAssignForces());
+            },
+            gameStep: async () => {
+                val(playerTotalForcesId(), val(playerTotalForcesId()) - val(playerCommitForcesId()));
+                val(opponentTotalForcesId(), val(opponentTotalForcesId()) - val(opponentCommitForcesId()));
+                val(playerCommitForcesId(), 0);
+                val(opponentCommitForcesId(), 0);
+
+                this.playerVictory = val(playerCommitForcesId()) > val(opponentCommitForcesId());
+                if (this.playerVictory) {
+                    val(playerVictoriesId(), val(playerVictoriesId()) + 1);
+                } else {
+                    val(opponentVictoriesId(), val(opponentVictoriesId()) + 1);
+                }
+            },
+            post: async () => {
+                val(outcomeId(), this.playerVictory ? "Victory!" : "Defeat!");
+            }
+        }
+    }
+
+    doGameStep = async (gameStep) => {
+        document.querySelectorAll("input").forEach(x => x.setAttribute("readonly", true));
+        document.querySelectorAll("button").forEach(x => x.setAttribute("disabled", true));
+
+        await gameStep.pre();
+        await gameStep.gameStep();
+        await gameStep.post();
+
+        document.querySelectorAll("input").forEach(x => x.removeAttribute("readonly"));
+        document.querySelectorAll("button").forEach(x => x.removeAttribute("disabled"));
+    }
+
+    opponentActionAssignForces = () => {
+        return {
+            startText: "Thinking...",
+            readyText: "Ready!",
+            fn: async () => {
+                const forces = Math.floor(Math.random() * val(opponentTotalForcesId()));
+                val(opponentCommitForcesId(), forces);
+            }
+        }
+    }
+
+    doOpponentAction = async (action) => {
+        return new Promise((resolve) => {
+            val(opponentActionsId(), action.startText);
+            setTimeout(() => {
+                val(opponentActionsId(), action.readyText);
+                setTimeout(async () => {
+                    val(opponentActionsId(), "");
+                    await action.fn();
+                    resolve();
+                }, 500)
+            }, 1000);
+        });
+    }
+
+    // TODO : can this be used for ui purposes, still?
+    // setValue = async (element, to) => {
+    //     const color = element.style.color;
+    //     element.style.color = "red";
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             element.style.color = color;
+    //             element.value = to;
+    //             resolve();
+    //         }, 1000);
+    //     })
+    // }
+
+</script>
 
 </html>
