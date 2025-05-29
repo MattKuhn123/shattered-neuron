@@ -11,6 +11,10 @@
  */
 class OutputForm extends HTMLFormElement {
     connectedCallback() {
+        document.addEventListener("DOMContentLoaded", () =>
+            new URLSearchParams(window.location.search).forEach((value, key) => this.val(key, value))
+        );
+
         this.addEventListener('submit', (e) => {
             this.querySelectorAll('output[id]').forEach(output => {
                 const hidden = document.createElement('input');
@@ -20,6 +24,28 @@ class OutputForm extends HTMLFormElement {
                 this.appendChild(hidden);
             });
         });
+    }
+
+    elt(id) {
+        return this.querySelector(`#${id}`);
+    }
+
+    val(id, value) {
+        const x = this.elt(id);
+        if (value !== undefined) {
+            if (x.tagName.toLowerCase() === "input") {
+                x.value = value.toString();
+            } else {
+                x.textContent = value.toString();
+            }
+        } else {
+            if (x.tagName.toLowerCase() === "input") {
+                return Number(x.value);
+            } else {
+                return Number(x.textContent);
+            }
+        }
+
     }
 }
 
