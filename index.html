@@ -12,44 +12,42 @@
 </head>
 
 <body>
-    <main>
+    <main class="surface surface-dark">
         <form is="submit-output-form" class="center-content">
-            <fieldset>
-                <legend>Scout Report</legend>
+            <section class="surface surface-light">
+                <h2>Scout Report</h2>
                 <label for="opponent-victory-points">Opponent Victory points: </label>
-                <output id="opponent-victory-points" name="opponent-victory-points" class="input">0</output>
+                <output id="opponent-victory-points" name="opponent-victory-points" class="input input-dark">0</output>
                 <label for="opponent-remaining-forces">Opponent remaining forces: </label>
-                <output id="opponent-remaining-forces" name="opponent-remaining-forces" class="input">1000</output>
+                <output id="opponent-remaining-forces" name="opponent-remaining-forces" class="input input-dark">1000</output>
                 <label for="opponent-actions-output">Opponent activity...</p>
                 <output id="opponent-actions-output"><samp id="opponent-actions"></samp></output>
-            </fieldset>
-            <fieldset>
-                <legend>HQ</legend>
+            </section>
+            <section class="surface surface-light">
+                <h2>HQ</h2>
                 <label for="player-victory-points">Victory Points: </label>
-                <output id="player-victory-points" name="player-victory-points" class="input">0</output>
+                <output id="player-victory-points" name="player-victory-points" class="input input-dark">0</output>
                 <label for="player-remaining-forces">Remaining forces: </label>
-                <output id="player-remaining-forces" name="player-remaining-forces" class="input">1000</output>
+                <output id="player-remaining-forces" name="player-remaining-forces" class="input input-dark">1000</output>
                 <fieldset>
                     <legend>Force commitment</legend>
                     <label for="player-commit-forces">Forces</label>
-                    <input id="player-commit-forces" type="number" name="player-commit-forces" required max="1" min="1"/>
+                    <input id="player-commit-forces" type="number" name="player-commit-forces" class="input input-dark" required max="1" min="1"/>
                 </fieldset>
-                <button>Commit</button>
-            </fieldset>
+                <button class="input input-dark">Commit</button>
+            </section>
         </form>
     </main>
-    <dialog>
+    <dialog class="surface surface-light">
         <h2>After Action Report</h2>
         <form method="dialog">
-            <fieldset>
-                <legend>Sir,</legend>
-                <aside>
-                    We commited <mark id="report-player-commitment"></mark> forces to the engagement.
-                    The opposition commited <mark id="report-opponent-commitment"></mark> forces.
-                    We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark id="report-victory-points">1</mark> victory points.
-                </aside>
-            </fieldset>
-            <button>Confirm</button>
+            <aside>
+                Sir,<br>
+                We commited <mark id="report-player-commitment"></mark> forces to the engagement.
+                The opposition commited <mark id="report-opponent-commitment"></mark> forces.
+                We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark id="report-victory-points">1</mark> victory points.
+            </aside>
+            <button class="input input-dark">Confirm</button>
         </form>
     </dialog>
 </body>
