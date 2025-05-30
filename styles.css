@@ -1,6 +1,6 @@
 :root {
     --text-color-light: ghostwhite;
-    --text-color-dark: darkgray;
+    --text-color-dark: black;
     --accent-color: aliceblue;
     --background-color-light: lightslategray;
     --background-color: slategray;
@@ -19,7 +19,7 @@ body {
 .surface {
     margin: 20px auto;
     width: 90%;
-    max-width: 800px;
+    max-width: 1200px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
     border-radius: 8px;

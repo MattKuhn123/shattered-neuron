@@ -59,6 +59,9 @@
                     <table class="table table-dark surface surface-light" style="flex: 2; border-right: 1px solid var(--accent-color); padding-right: 5px;">
                         <thead>
                             <tr>
+                                <th id="report-table-outcome-player-perspective" colspan="3"></th>
+                            </tr>
+                            <tr>
                                 <th></th>
                                 <th>Forces</th>
                                 <th>Opposition</th>
@@ -74,9 +77,6 @@
                                 <td>Commited forces</td>
                                 <td id="report-table-player-commited-forces"></td>
                                 <td id="report-table-opponent-commited-forces"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"><mark id="report-table-outcome-player-perspective"></mark></td>
                             </tr>
                             <tr>
                                 <td>Victory points</td>
@@ -98,7 +98,7 @@
                             id="report-victory-points"></mark> victory points.
                     </aside>
                 </div>
-                <button id="confirm-after-action-report" class="input input-dark">Confirm</button>
+                <button id="confirm-after-action-report" class="input input-light">Confirm</button>
             </form>
         </div>
     </dialog>
@@ -149,7 +149,7 @@
 
                 if (!params.has("opponent-victory-points"))
                     params.set("opponent-victory-points", "0");
-                
+
                 if (!params.has("rounds-remaining"))
                     params.set("rounds-remaining", "3");
 
