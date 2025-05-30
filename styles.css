@@ -1,7 +1,7 @@
 :root {
     --text-color-light: ghostwhite;
     --text-color-dark: darkgray;
-    --accent-color: seagreen;
+    --accent-color: aliceblue;
     --background-color-light: lightslategray;
     --background-color: slategray;
     --background-color-dark: darkslategray;
@@ -89,9 +89,8 @@ h1,h2,h3,h4,h5,h6 {
 
 mark {
     background-color: var(--accent-color);
-    color: var(--text-color-light);
-    padding: 2px 4px;
-    border-radius: 3px;
+    padding: 1px 1px;
+    border-radius: 1px;
 }
 
 progress {
