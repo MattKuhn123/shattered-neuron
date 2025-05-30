@@ -14,37 +14,44 @@
 <body>
     <main>
         <form is="submit-output-form" class="center-content">
-            <section>
-                <h1>Opponent Board</h1>
-                <label for="opponent-victories">Victories: </label>
-                <output id="opponent-victories" name="opponent-victories" class="input">0</output>
-                <label for="opponent-total-forces">Opponent total forces</label>
-                <output id="opponent-total-forces" name="opponent-total-forces" class="input">1000</output>
-                <fieldset>
-                    <legend>Opponent force commitment</legend>
-                    <label for="opponent-commit-forces">Forces</label>
-                    <output id="opponent-commit-forces" name="opponent-commit-forces" class="input"></output>
-                </fieldset>
-                <samp id="opponent-actions"></samp>
-            </section>
-            <section>
-                <h1>Board</h1>
-                <label for="player-victories">Victories: </label>
-                <output id="player-victories" name="player-victories" class="input">0</output>
-                <label for="player-total-forces">Total forces</label>
-                <output id="player-total-forces" name="player-total-forces" class="input">1000</output>
+            <fieldset>
+                <legend>Scout Report</legend>
+                <label for="opponent-victory-points">Opponent Victory points: </label>
+                <output id="opponent-victory-points" name="opponent-victory-points" class="input">0</output>
+                <label for="opponent-remaining-forces">Opponent remaining forces: </label>
+                <output id="opponent-remaining-forces" name="opponent-remaining-forces" class="input">1000</output>
+                <label for="opponent-actions-output">Opponent activity...</p>
+                <output id="opponent-actions-output"><samp id="opponent-actions"></samp></output>
+            </fieldset>
+            <fieldset>
+                <legend>HQ</legend>
+                <label for="player-victory-points">Victory Points: </label>
+                <output id="player-victory-points" name="player-victory-points" class="input">0</output>
+                <label for="player-remaining-forces">Remaining forces: </label>
+                <output id="player-remaining-forces" name="player-remaining-forces" class="input">1000</output>
                 <fieldset>
                     <legend>Force commitment</legend>
                     <label for="player-commit-forces">Forces</label>
-                    <input id="player-commit-forces" type="number" name="player-commit-forces" required max="5">
+                    <input id="player-commit-forces" type="number" name="player-commit-forces" required max="1" min="1"/>
                 </fieldset>
                 <button>Commit</button>
-            </section>
-            <aside>
-                <output id="outcome">output</output>
-            </aside>
+            </fieldset>
         </form>
     </main>
+    <dialog>
+        <h2>After Action Report</h2>
+        <form method="dialog">
+            <fieldset>
+                <legend>Sir,</legend>
+                <aside>
+                    We commited <mark id="report-player-commitment"></mark> forces to the engagement.
+                    The opposition commited <mark id="report-opponent-commitment"></mark> forces.
+                    We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark id="report-victory-points">1</mark> victory points.
+                </aside>
+            </fieldset>
+            <button>Confirm</button>
+        </form>
+    </dialog>
 </body>
 <script>
     elt = (id) => {
@@ -69,57 +76,93 @@
 
     }
 
-    playerTotalForcesId = () => "player-total-forces";
-    opponentTotalForcesId = () => "opponent-total-forces";
+    inc = (id, amount = 1) => val(id, val(id) + amount);
+
+    playerRemainingForcesId = () => "player-remaining-forces";
+    opponentRemainingForcesId = () => "opponent-remaining-forces";
     playerCommitForcesId = () => "player-commit-forces";
-    opponentCommitForcesId = () => "opponent-commit-forces";
-    playerVictoriesId = () => "player-victories";
-    opponentVictoriesId = () => "opponent-victories";
-    outcomeId = () => "outcome";
-    opponentActionsId = () => "opponent-actions";
+    playerVictoryPointsId = () => "player-victory-points";
+    opponentVictoryPointsId = () => "opponent-victory-points";
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const params = new URLSearchParams(window.location.search);
-        if (!params.size) {
-            return;
-        }
+    document.addEventListener("DOMContentLoaded", () => doEngagementCycle(engagementCycle()));
 
-        params.forEach((v, k) => val(k, v));
-        doGameStep(doGameStepAttack());
-    });
-
-    doGameStepAttack = () => {
+    engagementCycle = () => {
         return {
-            playerVictory: undefined,
-            pre: async () => {
-                await doOpponentAction(opponentActionAssignForces());
+            playerVictory: false,
+            opponentForces: 0,
+            victoryPoints: 1,
+            setUpGameState: async () => {
+                const { params, isStart } = getInitState();
+                params.forEach((v, k) => val(k, v));
+                return isStart;
             },
-            gameStep: async () => {
-                val(playerTotalForcesId(), val(playerTotalForcesId()) - val(playerCommitForcesId()));
-                val(opponentTotalForcesId(), val(opponentTotalForcesId()) - val(opponentCommitForcesId()));
-                val(playerCommitForcesId(), 0);
-                val(opponentCommitForcesId(), 0);
+            opponentTurn: async () => {
+                this.opponentForces = await doOpponentAction(opponentActionAssignForces());
+            },
+            engage: async () => {
+                inc(playerRemainingForcesId(), -val(playerCommitForcesId()));
+                inc(opponentRemainingForcesId(), -this.opponentForces);
 
-                this.playerVictory = val(playerCommitForcesId()) > val(opponentCommitForcesId());
+                this.playerVictory = val(playerCommitForcesId()) > this.opponentForces;
                 if (this.playerVictory) {
-                    val(playerVictoriesId(), val(playerVictoriesId()) + 1);
+                    inc(playerVictoryPointsId(), this.victoryPoints);
                 } else {
-                    val(opponentVictoriesId(), val(opponentVictoriesId()) + 1);
+                    inc(opponentVictoryPointsId(), this.victoryPoints);
                 }
             },
-            post: async () => {
-                val(outcomeId(), this.playerVictory ? "Victory!" : "Defeat!");
+            postEngagement: async () => {
+                val("report-player-commitment", val(playerCommitForcesId()));
+                val("report-opponent-commitment", this.opponentForces);
+                val("report-outcome", `${this.playerVictory ? "won" : "lost"}`);
+                val("report-victory-points", this.victoryPoints);
+                document.querySelector("dialog").showModal();
+            },
+            setUpPlayerTurn: async () => {
+                val(playerCommitForcesId(), 0);
+                elt(playerCommitForcesId()).max = val(playerRemainingForcesId());
+            },
+            checkFinalState: async() => {
+                // TODO : Check if the game is over
             }
         }
     }
 
-    doGameStep = async (gameStep) => {
+    getInitState = () => {
+        const params = new URLSearchParams(window.location.search);
+        const isStart = params.size === 0;
+
+        if (!params.has("player-remaining-forces")) {
+            params.set("player-remaining-forces", "1000");
+        }
+
+        if (!params.has("opponent-remaining-forces")) {
+            params.set("opponent-remaining-forces", "1000");
+        }
+
+        if (!params.has("player-victory-points")) {
+            params.set("player-victory-points", "0");
+        }
+
+        if (!params.has("opponent-victory-points")) {
+            params.set("opponent-victory-points", "0");
+        }
+
+        return { params, isStart };
+    }
+
+    doEngagementCycle = async (engagementCycle) => {
         document.querySelectorAll("input").forEach(x => x.setAttribute("readonly", true));
         document.querySelectorAll("button").forEach(x => x.setAttribute("disabled", true));
 
-        await gameStep.pre();
-        await gameStep.gameStep();
-        await gameStep.post();
+        const isStart = await engagementCycle.setUpGameState();
+        if (!isStart) {
+            await engagementCycle.opponentTurn();
+            await engagementCycle.engage();
+            await engagementCycle.postEngagement();
+        }
+
+        await engagementCycle.setUpPlayerTurn();
+        await engagementCycle.checkFinalState();
 
         document.querySelectorAll("input").forEach(x => x.removeAttribute("readonly"));
         document.querySelectorAll("button").forEach(x => x.removeAttribute("disabled"));
@@ -127,42 +170,28 @@
 
     opponentActionAssignForces = () => {
         return {
-            startText: "Thinking...",
-            readyText: "Ready!",
+            startText: "Planning...",
+            readyText: "Mobilizing...",
             fn: async () => {
-                const forces = Math.floor(Math.random() * val(opponentTotalForcesId()));
-                val(opponentCommitForcesId(), forces);
+                const forces = Math.floor(Math.random() * val(opponentRemainingForcesId()));
+                return forces;
             }
         }
     }
 
     doOpponentAction = async (action) => {
         return new Promise((resolve) => {
-            val(opponentActionsId(), action.startText);
+            val("opponent-actions", action.startText);
             setTimeout(() => {
-                val(opponentActionsId(), action.readyText);
+                val("opponent-actions", action.readyText);
                 setTimeout(async () => {
-                    val(opponentActionsId(), "");
-                    await action.fn();
-                    resolve();
+                    val("opponent-actions", "");
+                    const result = await action.fn();
+                    resolve(result);
                 }, 500)
             }, 1000);
         });
     }
-
-    // TODO : can this be used for ui purposes, still?
-    // setValue = async (element, to) => {
-    //     const color = element.style.color;
-    //     element.style.color = "red";
-    //     return new Promise((resolve) => {
-    //         setTimeout(() => {
-    //             element.style.color = color;
-    //             element.value = to;
-    //             resolve();
-    //         }, 1000);
-    //     })
-    // }
-
 </script>
 
 </html>

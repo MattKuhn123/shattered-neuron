@@ -100,5 +100,3 @@ class FormulaOutput extends HTMLOutputElement {
 }
 
 customElements.define('formula-output', FormulaOutput, { extends: 'output' });
-
- 

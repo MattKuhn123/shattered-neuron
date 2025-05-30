@@ -34,5 +34,3 @@ class SubmitOutputForm extends HTMLFormElement {
 }
 
 customElements.define('submit-output-form', SubmitOutputForm, { extends: 'form' });
-
- 
