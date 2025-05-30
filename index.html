@@ -19,35 +19,43 @@
                 <label for="opponent-victory-points">Opponent Victory points: </label>
                 <output id="opponent-victory-points" name="opponent-victory-points" class="input input-dark">0</output>
                 <label for="opponent-remaining-forces">Opponent remaining forces: </label>
-                <output id="opponent-remaining-forces" name="opponent-remaining-forces" class="input input-dark">1000</output>
-                <label for="opponent-actions-output">Opponent activity...</p>
-                <output id="opponent-actions-output"><samp id="opponent-actions"></samp></output>
+                <output id="opponent-remaining-forces" name="opponent-remaining-forces"
+                    class="input input-dark">1000</output>
+                <div id="opponent-activity-container" style="display: none;">
+                    <label for="opponent-actions-output">Opponent activity...</label>
+                    <output id="opponent-actions-output"><samp id="opponent-actions"></samp></output>
+                    <label for="opponent-progress">Opponent progress...</label>
+                    <progress id="opponent-progress" max="100" value="0"></progress>
+                </div>
             </section>
             <section class="surface surface-light">
                 <h2>HQ</h2>
                 <label for="player-victory-points">Victory Points: </label>
                 <output id="player-victory-points" name="player-victory-points" class="input input-dark">0</output>
                 <label for="player-remaining-forces">Remaining forces: </label>
-                <output id="player-remaining-forces" name="player-remaining-forces" class="input input-dark">1000</output>
+                <output id="player-remaining-forces" name="player-remaining-forces"
+                    class="input input-dark">1000</output>
                 <fieldset>
                     <legend>Force commitment</legend>
-                    <label for="player-commit-forces">Forces</label>
-                    <input id="player-commit-forces" type="number" name="player-commit-forces" class="input input-dark" required max="1" min="1"/>
+                    <label for="player-commit-forces">Forces: </label>
+                    <input id="player-commit-forces" type="number" name="player-commit-forces" class="input input-dark"
+                        required max="1" min="1" />
                 </fieldset>
                 <button class="input input-dark">Commit</button>
             </section>
         </form>
     </main>
-    <dialog class="surface surface-light">
+    <dialog id="after-action-report" class="surface surface-light">
         <h2>After Action Report</h2>
         <form method="dialog">
             <aside>
                 Sir,<br>
                 We commited <mark id="report-player-commitment"></mark> forces to the engagement.
                 The opposition commited <mark id="report-opponent-commitment"></mark> forces.
-                We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark id="report-victory-points">1</mark> victory points.
+                We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark
+                    id="report-victory-points">1</mark> victory points.
             </aside>
-            <button class="input input-dark">Confirm</button>
+            <button id="confirm-after-action-report" class="input input-dark">Confirm</button>
         </form>
     </dialog>
 </body>
@@ -76,12 +84,6 @@
 
     inc = (id, amount = 1) => val(id, val(id) + amount);
 
-    playerRemainingForcesId = () => "player-remaining-forces";
-    opponentRemainingForcesId = () => "opponent-remaining-forces";
-    playerCommitForcesId = () => "player-commit-forces";
-    playerVictoryPointsId = () => "player-victory-points";
-    opponentVictoryPointsId = () => "opponent-victory-points";
-
     document.addEventListener("DOMContentLoaded", () => doEngagementCycle(engagementCycle()));
 
     engagementCycle = () => {
@@ -90,105 +92,94 @@
             opponentForces: 0,
             victoryPoints: 1,
             setUpGameState: async () => {
-                const { params, isStart } = getInitState();
+                const params = new URLSearchParams(window.location.search);
+                const isStart = params.size === 0;
+
+                if (!params.has("player-remaining-forces"))
+                    params.set("player-remaining-forces", "1000");
+
+                if (!params.has("opponent-remaining-forces"))
+                    params.set("opponent-remaining-forces", "1000");
+
+                if (!params.has("player-victory-points"))
+                    params.set("player-victory-points", "0");
+
+                if (!params.has("opponent-victory-points"))
+                    params.set("opponent-victory-points", "0");
+
                 params.forEach((v, k) => val(k, v));
                 return isStart;
             },
-            opponentTurn: async () => {
-                this.opponentForces = await doOpponentAction(opponentActionAssignForces());
+            opponentCommitForces: async () => {
+                return new Promise((resolve) => {
+                    document.getElementById("opponent-activity-container").style = "display: block;";
+                    document.getElementById("opponent-progress").value = 0;
+                    val("opponent-actions", "Planning...");
+                    setTimeout(() => {
+                        document.getElementById("opponent-progress").value = 50;
+                        val("opponent-actions", "Mobilizing...");
+                        setTimeout(async () => {
+                            document.getElementById("opponent-progress").value = 100;
+                            val("opponent-actions", "");
+                            this.opponentForces = Math.floor(Math.random() * val("opponent-remaining-forces"));
+                            resolve();
+                        }, 500)
+                    }, 1000);
+                });
             },
             engage: async () => {
-                inc(playerRemainingForcesId(), -val(playerCommitForcesId()));
-                inc(opponentRemainingForcesId(), -this.opponentForces);
+                inc("player-remaining-forces", -val("player-commit-forces"));
+                inc("opponent-remaining-forces", -this.opponentForces);
 
-                this.playerVictory = val(playerCommitForcesId()) > this.opponentForces;
+                this.playerVictory = val("player-commit-forces") > this.opponentForces;
                 if (this.playerVictory) {
-                    inc(playerVictoryPointsId(), this.victoryPoints);
+                    inc("player-victory-points", this.victoryPoints);
                 } else {
-                    inc(opponentVictoryPointsId(), this.victoryPoints);
+                    inc("opponent-victory-points", this.victoryPoints);
                 }
             },
-            postEngagement: async () => {
-                val("report-player-commitment", val(playerCommitForcesId()));
+            afterActionReport: async () => {
+                val("report-player-commitment", val("player-commit-forces"));
                 val("report-opponent-commitment", this.opponentForces);
                 val("report-outcome", `${this.playerVictory ? "won" : "lost"}`);
                 val("report-victory-points", this.victoryPoints);
-                document.querySelector("dialog").showModal();
+                document.getElementById("after-action-report").showModal();
+                return new Promise((resolve) => {
+                    document.getElementById("after-action-report").addEventListener("close", () => {
+                        resolve();
+                    }, { once: true });
+                });
             },
-            setUpPlayerTurn: async () => {
-                val(playerCommitForcesId(), 0);
-                elt(playerCommitForcesId()).max = val(playerRemainingForcesId());
-            },
-            checkFinalState: async() => {
+            checkFinalState: async () => {
                 // TODO : Check if the game is over
+            },
+            setUpPlayerCommitForces: async () => {
+                document.getElementById("opponent-progress").value = 0;
+                document.getElementById("opponent-activity-container").style = "display: none;";
+                val("player-commit-forces", 0);
+                elt("player-commit-forces").max = val("player-remaining-forces");
             }
         }
-    }
-
-    getInitState = () => {
-        const params = new URLSearchParams(window.location.search);
-        const isStart = params.size === 0;
-
-        if (!params.has("player-remaining-forces")) {
-            params.set("player-remaining-forces", "1000");
-        }
-
-        if (!params.has("opponent-remaining-forces")) {
-            params.set("opponent-remaining-forces", "1000");
-        }
-
-        if (!params.has("player-victory-points")) {
-            params.set("player-victory-points", "0");
-        }
-
-        if (!params.has("opponent-victory-points")) {
-            params.set("opponent-victory-points", "0");
-        }
-
-        return { params, isStart };
     }
 
     doEngagementCycle = async (engagementCycle) => {
         document.querySelectorAll("input").forEach(x => x.setAttribute("readonly", true));
         document.querySelectorAll("button").forEach(x => x.setAttribute("disabled", true));
-
+        
         const isStart = await engagementCycle.setUpGameState();
         if (!isStart) {
-            await engagementCycle.opponentTurn();
+            await engagementCycle.opponentCommitForces();
             await engagementCycle.engage();
-            await engagementCycle.postEngagement();
+            document.querySelector("#confirm-after-action-report").removeAttribute("disabled");
+            await engagementCycle.afterActionReport();
+            document.querySelector("#confirm-after-action-report").setAttribute("disabled", true);
         }
 
-        await engagementCycle.setUpPlayerTurn();
         await engagementCycle.checkFinalState();
+        await engagementCycle.setUpPlayerCommitForces();
 
         document.querySelectorAll("input").forEach(x => x.removeAttribute("readonly"));
         document.querySelectorAll("button").forEach(x => x.removeAttribute("disabled"));
-    }
-
-    opponentActionAssignForces = () => {
-        return {
-            startText: "Planning...",
-            readyText: "Mobilizing...",
-            fn: async () => {
-                const forces = Math.floor(Math.random() * val(opponentRemainingForcesId()));
-                return forces;
-            }
-        }
-    }
-
-    doOpponentAction = async (action) => {
-        return new Promise((resolve) => {
-            val("opponent-actions", action.startText);
-            setTimeout(() => {
-                val("opponent-actions", action.readyText);
-                setTimeout(async () => {
-                    val("opponent-actions", "");
-                    const result = await action.fn();
-                    resolve(result);
-                }, 500)
-            }, 1000);
-        });
     }
 </script>
 
