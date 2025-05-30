@@ -45,16 +45,52 @@
             </section>
         </form>
     </main>
-    <dialog id="after-action-report" class="surface surface-light">
+    <dialog id="after-action-report" class="">
         <h2>After Action Report</h2>
         <form method="dialog">
-            <aside>
-                Sir,<br>
-                We commited <mark id="report-player-commitment"></mark> forces to the engagement.
-                The opposition commited <mark id="report-opponent-commitment"></mark> forces.
-                We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark
-                    id="report-victory-points">1</mark> victory points.
-            </aside>
+            <div style="display: flex; gap: 10px;" class="surface surface-light">
+                <table style="flex: 2; border-right: 1px solid var(--accent-color); padding-right: 5px;" class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Forces</th>
+                            <th>Opposition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Starting forces</td>
+                            <td id="report-table-player-starting-forces"></td>
+                            <td id="report-table-opponent-starting-forces"></td>
+                        </tr>
+                        <tr>
+                            <td>Commited forces</td>
+                            <td id="report-table-player-commited-forces"></td>
+                            <td id="report-table-opponent-commited-forces"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><mark id="report-table-outcome-player-perspective"></mark></td>
+                        </tr>
+                        <tr>
+                            <td>Victory points</td>
+                            <td id="report-table-player-earned-victory-points"></td>
+                            <td id="report-table-opponent-earned-victory-points"></td>
+                        </tr>
+                        <tr>
+                            <td>Remaining forces</td>
+                            <td id="report-table-player-remaining-forces"></td>
+                            <td id="report-table-opponent-remaining-forces"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <aside style="flex: 1;">
+                    Sir,<br>
+                    We commited <mark id="report-player-commitment"></mark> forces to the engagement.
+                    The opposition commited <mark id="report-opponent-commitment"></mark> forces.
+                    We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark
+                        id="report-victory-points"></mark> victory points.
+                </aside>
+            </div>
             <button id="confirm-after-action-report" class="input input-dark">Confirm</button>
         </form>
     </dialog>
@@ -66,11 +102,13 @@
 
     val = (id, value) => {
         const x = elt(id);
+        if (!x) throw `Element with id '${id}' not found.`;
+
         if (value !== undefined) {
             if (x.tagName.toLowerCase() === "input") {
-                x.value = value.toString();
+                x.value = value;
             } else {
-                x.textContent = value.toString();
+                x.textContent = value;
             }
         } else {
             if (x.tagName.toLowerCase() === "input") {
@@ -88,9 +126,6 @@
 
     engagementCycle = () => {
         return {
-            playerVictory: false,
-            opponentForces: 0,
-            victoryPoints: 1,
             setUpGameState: async () => {
                 const params = new URLSearchParams(window.location.search);
                 const isStart = params.size === 0;
@@ -131,6 +166,7 @@
                 inc("player-remaining-forces", -val("player-commit-forces"));
                 inc("opponent-remaining-forces", -this.opponentForces);
 
+                this.victoryPoints = 1;
                 this.playerVictory = val("player-commit-forces") > this.opponentForces;
                 if (this.playerVictory) {
                     inc("player-victory-points", this.victoryPoints);
@@ -139,11 +175,22 @@
                 }
             },
             afterActionReport: async () => {
+                document.getElementById("after-action-report").showModal();
                 val("report-player-commitment", val("player-commit-forces"));
                 val("report-opponent-commitment", this.opponentForces);
                 val("report-outcome", `${this.playerVictory ? "won" : "lost"}`);
                 val("report-victory-points", this.victoryPoints);
-                document.getElementById("after-action-report").showModal();
+
+                val("report-table-player-starting-forces", val("player-remaining-forces") + val("player-commit-forces"));
+                val("report-table-opponent-starting-forces", val("opponent-remaining-forces") + this.opponentForces);
+                val("report-table-player-commited-forces", val("player-commit-forces"));
+                val("report-table-opponent-commited-forces", this.opponentForces);
+                val("report-table-player-earned-victory-points", (this.playerVictory ? this.victoryPoints : "0"));
+                val("report-table-opponent-earned-victory-points", (this.playerVictory ? "0" : this.victoryPoints));
+                val("report-table-player-remaining-forces", val("player-remaining-forces"));
+                val("report-table-opponent-remaining-forces", val("opponent-remaining-forces"));
+                val("report-table-outcome-player-perspective", this.playerVictory ? "Victory" : "Defeat");
+
                 return new Promise((resolve) => {
                     document.getElementById("after-action-report").addEventListener("close", () => {
                         resolve();

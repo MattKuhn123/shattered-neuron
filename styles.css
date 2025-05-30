@@ -1,7 +1,7 @@
 :root {
     --text-color-light: ghostwhite;
     --text-color-dark: darkgray;
-    --accent-color: darkorange;
+    --accent-color: seagreen;
     --background-color-light: lightslategray;
     --background-color: slategray;
     --background-color-dark: darkslategray;
@@ -86,6 +86,7 @@ h1,h2,h3,h4,h5,h6 {
     gap: 50px;
 }
 
+
 mark {
     background-color: var(--accent-color);
     color: var(--text-color-light);
@@ -98,6 +99,8 @@ progress {
     height: 20px;
     border-radius: 10px;
     overflow: hidden;
+    color: var(--accent-color);
+    background-color: var(--background-color-light);
 }
 
 /* Chrome, Safari, Opera */
@@ -116,8 +119,9 @@ progress::-moz-progress-bar {
     border-radius: 10px;
 }
 
-/* IE/Edge (old) */
-progress {
-    color: var(--accent-color);
-    background-color: var(--background-color-light);
+.table tbody tr td {
+    padding: 8px;
+    border-bottom: 1px solid var(--accent-color);
+    text-align: center;
+
 }
