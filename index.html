@@ -13,7 +13,6 @@
 
 <body>
     <main class="surface surface-dark">
-        <h1>Engagement</h1>
         <form is="submit-output-form" class="center-content">
             <section class="surface surface-light">
                 <h2>Sit Rep</h2>
@@ -29,6 +28,11 @@
                     class="input input-dark">1000</output>
             </section>
             <section class="surface surface-light">
+                <h2>Scout</h2>
+                <label for="rounds-remaining">Rounds remaining: </label>
+                <output class="input input-dark" id="rounds-remaining" name="rounds-remaining"></output>
+            </section>
+            <section class="surface surface-light">
                 <h2>Command</h2>
                 <fieldset>
                     <legend>Force commitment</legend>
@@ -39,7 +43,7 @@
                 <button class="input input-dark">Commit</button>
             </section>
             <section class="surface surface-light">
-                <h2>Intel Report</h2>
+                <h2>Intel</h2>
                 <label for="opponent-actions-output">Opponent activity...</label>
                 <output id="opponent-actions-output"><samp id="opponent-actions">Unknown...</samp></output>
                 <label for="opponent-progress">Opponent progress...</label>
@@ -145,6 +149,9 @@
 
                 if (!params.has("opponent-victory-points"))
                     params.set("opponent-victory-points", "0");
+                
+                if (!params.has("rounds-remaining"))
+                    params.set("rounds-remaining", "3");
 
                 params.forEach((v, k) => val(k, v));
                 return isStart;
@@ -170,6 +177,7 @@
             engage: async () => {
                 inc("player-remaining-forces", -val("player-commit-forces"));
                 inc("opponent-remaining-forces", -this.opponentForces);
+                inc("rounds-remaining", -1);
 
                 this.victoryPoints = 1;
                 this.playerVictory = val("player-commit-forces") > this.opponentForces;
@@ -203,7 +211,18 @@
                 });
             },
             checkFinalState: async () => {
-                // TODO : Check if the game is over
+                if (val("rounds-remaining") <= 0) {
+                    if (val("player-victory-points") > val("opponent-victory-points")) {
+                        alert("You have won the engagement!");
+                    } else if (val("player-victory-points") < val("opponent-victory-points")) {
+                        alert("You have lost the engagement.");
+                    } else {
+                        alert("The engagement ended in a draw.");
+                    }
+                    // Reset the game state
+                    window.location.search = "";
+
+                }
             },
             setUpPlayerCommitForces: async () => {
                 val("player-commit-forces", 0);
