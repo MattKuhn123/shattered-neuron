@@ -97,26 +97,6 @@ mark {
 progress {
     width: 100%;
     height: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    color: var(--accent-color);
-    background-color: var(--background-color-light);
-}
-
-/* Chrome, Safari, Opera */
-progress::-webkit-progress-bar {
-    background-color: var(--background-color-light);
-    border-radius: 10px;
-}
-progress::-webkit-progress-value {
-    background-color: var(--accent-color);
-    border-radius: 10px;
-}
-
-/* Firefox */
-progress::-moz-progress-bar {
-    background-color: var(--accent-color);
-    border-radius: 10px;
 }
 
 .table tbody tr td {
