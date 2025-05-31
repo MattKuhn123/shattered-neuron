@@ -9,11 +9,20 @@
     <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js></script>
     <script src="./formula-output.js"></script>
     <script src="./submit-output-form.js"></script>
+    <style>
+        section {
+            flex: 2;
+            transition: flex 0.3s ease;
+        }
+        section:hover {
+            flex: 3;
+        }
+    </style>
 </head>
 
 <body>
     <main class="surface surface-dark">
-        <form is="submit-output-form" class="center-content">
+        <form is="submit-output-form" style="display: flex; gap: 10px;">
             <section class="surface surface-light">
                 <h2>Sit Rep</h2>
                 <label for="player-victory-points">Victory Points: </label>
@@ -40,7 +49,7 @@
                     <input id="player-commit-forces" type="number" name="player-commit-forces" class="input input-dark"
                         required max="1" min="1" />
                 </fieldset>
-                <button class="input input-dark">Commit</button>
+                <button class="btn btn-dark">Commit</button>
             </section>
             <section class="surface surface-light">
                 <h2>Intel</h2>
@@ -56,7 +65,7 @@
             <h2>After Action Report</h2>
             <form method="dialog">
                 <div style="display: flex; gap: 10px;">
-                    <table class="table table-dark surface surface-light" style="flex: 2; border-right: 1px solid var(--accent-color); padding-right: 5px;">
+                    <table class="table table-dark surface surface-light" style="flex: 2;">
                         <thead>
                             <tr>
                                 <th id="report-table-outcome-player-perspective" colspan="3"></th>
@@ -98,7 +107,7 @@
                             id="report-victory-points"></mark> victory points.
                     </aside>
                 </div>
-                <button id="confirm-after-action-report" class="input input-light">Confirm</button>
+                <button id="confirm-after-action-report" class="btn btn-light">Confirm</button>
             </form>
         </div>
     </dialog>

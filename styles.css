@@ -1,10 +1,11 @@
 :root {
-    --text-color-light: ghostwhite;
-    --text-color-dark: black;
-    --accent-color: aliceblue;
-    --background-color-light: lightslategray;
-    --background-color: slategray;
-    --background-color-dark: darkslategray;
+    --txt-color-000: darkslategray;
+    --txt-color-200: black;
+    --pri-color-000: yellow;
+    --acc-color-000: purple;
+    --bgr-color-000: white;
+    --bgr-color-100: snow;
+    --bgr-color-200: ghostwhite;
 }
 
 dialog::backdrop {
@@ -12,49 +13,13 @@ dialog::backdrop {
 }
 
 body {
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    background-color: var(--background-color-light);
-}
-
-.surface {
-    margin: 20px auto;
-    width: 90%;
-    max-width: 1200px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.surface-dark {
-    background-color: var(--background-color-dark);
-}
-
-.surface-light {
-    background-color: var(--background-color-light);
+    font-family: sans-serif;
+    background-color: var(--bgr-color-000);
 }
 
 button {
     width: 100%;
     padding: 10px 10px;
-}
-
-.input {
-    padding: 6px 6px;
-    margin: 8px 0px;
-    border: 1px solid var(--accent-color);
-    border-radius: 3px;
-    display: block;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.input-dark {
-    color: var(--text-color-light);
-    background-color: var(--background-color-dark);
-}
-
-.input-light {
-    color: var(--text-color-dark);
-    background-color: var(--background-color-light);
 }
 
 output.input:empty::before {
@@ -82,26 +47,50 @@ h1,h2,h3,h4,h5,h6 {
     text-transform: uppercase;
 }
 
-.center-content {
-    display: flex;
-    gap: 50px;
-}
-
-
 mark {
-    background-color: var(--accent-color);
+    background-color: var(--acc-color-000);
     padding: 1px 1px;
     border-radius: 1px;
 }
 
 progress {
     width: 100%;
-    height: 20px;
 }
+
+.surface {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.surface-dark {
+    background-color: var(--bgr-color-200);
+}
+
+.surface-light {
+    background-color: var(--bgr-color-000);
+}
+
+.input {
+    padding: 6px 6px;
+    margin: 8px 0px;
+    border: 1px solid var(--acc-color-000);
+    border-radius: 3px;
+    display: block;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.input-dark {
+    color: var(--txt-color-000);
+}
+
+.input-light {
+    color: var(--txt-color-200);
+}
+
 
 .table tbody tr td {
     padding: 8px;
-    border-bottom: 1px solid var(--accent-color);
+    border-bottom: 1px solid var(--acc-color-000);
     text-align: center;
-
 }
