@@ -23,7 +23,7 @@
 
 <body>
     <main class="surface surface-dark">
-        <form is="submit-output-form" class="player-dashboard">
+        <form is="submit-output-form" class="player-dashboard" id="player-dashboard">
             <section class="surface surface-light player-dashboard-item" style="flex: 1;">
                 <h2>Sit Rep</h2>
                 <label for="player-victory-points">Victory Points: </label>
@@ -95,9 +95,9 @@
                     </table>
                     <aside class="surface surface-light" style="flex: 1;">
                         Sir,<br>
-                        We commited <mark id="report-player-commitment"></mark> forces to the engagement.
+                        We commited <mark id="report-player-commitment"></mark> forces to the skirmish.
                         The opposition commited <mark id="report-opponent-commitment"></mark> forces.
-                        We <mark id="report-outcome"></mark> the engagement, and the victor gained <mark
+                        We <mark id="report-outcome"></mark> the skirmish, and the victor gained <mark
                             id="report-victory-points"></mark> victory points.
                     </aside>
                 </div>
@@ -112,6 +112,15 @@
             <output id="opponent-actions-output"><samp id="opponent-actions">Unknown...</samp></output>
             <label for="opponent-progress">Opponent progress...</label>
             <progress id="opponent-progress"></progress>
+        </section>
+    </dialog>
+    <dialog id="skirmish-over">
+        <section class="surface surface-dark">
+            <h2>Disengaging from the skirmish...</h2>
+            <p>The skirmish has ended in a <mark id="skirmish-outcome"></mark></p>
+            <form method="dialog">
+                <button class="btn btn-light" onclick="window.location.search = '';">Return to map</button>
+            </form>
         </section>
     </dialog>
 </body>
@@ -142,9 +151,9 @@
 
     inc = (id, amount = 1) => val(id, val(id) + amount);
 
-    document.addEventListener("DOMContentLoaded", () => doEngagementCycle(engagementCycle()));
+    document.addEventListener("DOMContentLoaded", () => doSkirmishCycle(skirmishCycle()));
 
-    engagementCycle = () => {
+    skirmishCycle = () => {
         return {
             setUpGameState: async () => {
                 const params = new URLSearchParams(window.location.search);
@@ -223,15 +232,22 @@
             },
             checkFinalState: async () => {
                 if (val("rounds-remaining") <= 0) {
-                    if (val("player-victory-points") > val("opponent-victory-points")) {
-                        alert("You have won the engagement!");
-                    } else if (val("player-victory-points") < val("opponent-victory-points")) {
-                        alert("You have lost the engagement.");
-                    } else {
-                        alert("The engagement ended in a draw.");
-                    }
-
-                    window.location.search = "";
+                    const skirmishOutcome = val("player-victory-points") > val("opponent-victory-points") ? "victory" :
+                        (val("player-victory-points") < val("opponent-victory-points") ? "defeat" : "draw");
+                    val("skirmish-outcome", skirmishOutcome);
+                    document.getElementById("skirmish-over").showModal();
+                    document.getElementById("skirmish-over").addEventListener("close", () => {
+                        const params = new URLSearchParams(window.location.search); // TODO this info is outdated
+                        const data = new Blob([params.toString()], { type: 'text/plain' });
+                        const url = URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `skirmish-${new Date().toISOString()}.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, { once: true });
                 }
             },
             setUpPlayerCommitForces: async () => {
@@ -241,21 +257,21 @@
         }
     }
 
-    doEngagementCycle = async (engagementCycle) => {
+    doSkirmishCycle = async (skirmishCycle) => {
         document.querySelectorAll("input").forEach(x => x.setAttribute("readonly", true));
         document.querySelectorAll("button").forEach(x => x.setAttribute("disabled", true));
         
-        const isStart = await engagementCycle.setUpGameState();
+        const isStart = await skirmishCycle.setUpGameState();
         if (!isStart) {
-            await engagementCycle.opponentCommitForces();
-            await engagementCycle.engage();
+            await skirmishCycle.opponentCommitForces();
+            await skirmishCycle.engage();
             document.querySelector("#confirm-after-action-report").removeAttribute("disabled");
-            await engagementCycle.afterActionReport();
+            await skirmishCycle.afterActionReport();
             document.querySelector("#confirm-after-action-report").setAttribute("disabled", true);
         }
 
-        await engagementCycle.checkFinalState();
-        await engagementCycle.setUpPlayerCommitForces();
+        await skirmishCycle.checkFinalState();
+        await skirmishCycle.setUpPlayerCommitForces();
 
         document.querySelectorAll("input").forEach(x => x.removeAttribute("readonly"));
         document.querySelectorAll("button").forEach(x => x.removeAttribute("disabled"));
