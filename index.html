@@ -10,20 +10,21 @@
     <script src="./formula-output.js"></script>
     <script src="./submit-output-form.js"></script>
     <style>
-        section {
-            flex: 2;
-            transition: flex 0.3s ease;
+        .player-dashboard {
+            display: flex; 
+            gap: 10px;
         }
-        section:hover {
-            flex: 3;
+        .player-dashboard-item:hover {
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+            transition: box-shadow 0.3s ease;
         }
     </style>
 </head>
 
 <body>
     <main class="surface surface-dark">
-        <form is="submit-output-form" style="display: flex; gap: 10px;">
-            <section class="surface surface-light">
+        <form is="submit-output-form" class="player-dashboard">
+            <section class="surface surface-light player-dashboard-item" style="flex: 1;">
                 <h2>Sit Rep</h2>
                 <label for="player-victory-points">Victory Points: </label>
                 <output id="player-victory-points" name="player-victory-points" class="input input-dark">0</output>
@@ -36,12 +37,7 @@
                 <output id="opponent-remaining-forces" name="opponent-remaining-forces"
                     class="input input-dark">1000</output>
             </section>
-            <section class="surface surface-light">
-                <h2>Scout</h2>
-                <label for="rounds-remaining">Rounds remaining: </label>
-                <output class="input input-dark" id="rounds-remaining" name="rounds-remaining"></output>
-            </section>
-            <section class="surface surface-light">
+            <section class="surface surface-light player-dashboard-item" style="flex: 4;">
                 <h2>Command</h2>
                 <fieldset>
                     <legend>Force commitment</legend>
@@ -49,19 +45,17 @@
                     <input id="player-commit-forces" type="number" name="player-commit-forces" class="input input-dark"
                         required max="1" min="1" />
                 </fieldset>
-                <button class="btn btn-dark">Commit</button>
+                <button class="btn btn-light">Commit</button>
             </section>
-            <section class="surface surface-light">
-                <h2>Intel</h2>
-                <label for="opponent-actions-output">Opponent activity...</label>
-                <output id="opponent-actions-output"><samp id="opponent-actions">Unknown...</samp></output>
-                <label for="opponent-progress">Opponent progress...</label>
-                <progress id="opponent-progress"></progress>
+            <section class="surface surface-light player-dashboard-item" style="flex: 1;">
+                <h2>Scout</h2>
+                <label for="rounds-remaining">Rounds remaining: </label>
+                <output class="input input-dark" id="rounds-remaining" name="rounds-remaining"></output>
             </section>
         </form>
     </main>
     <dialog id="after-action-report">
-        <div class="surface surface-dark">
+        <section class="surface surface-dark">
             <h2>After Action Report</h2>
             <form method="dialog">
                 <div style="display: flex; gap: 10px;">
@@ -109,7 +103,16 @@
                 </div>
                 <button id="confirm-after-action-report" class="btn btn-light">Confirm</button>
             </form>
-        </div>
+        </section>
+    </dialog>
+    <dialog id="opposition-activity">
+        <section class="surface surface-dark">
+            <h2>Opposition activity</h2>
+            <label for="opponent-actions-output">Opponent activity...</label>
+            <output id="opponent-actions-output"><samp id="opponent-actions">Unknown...</samp></output>
+            <label for="opponent-progress">Opponent progress...</label>
+            <progress id="opponent-progress"></progress>
+        </section>
     </dialog>
 </body>
 <script>
@@ -165,21 +168,20 @@
                 params.forEach((v, k) => val(k, v));
                 return isStart;
             },
-            opponentCommitForces: async () => {
+            opponentCommitForces: () => {
                 return new Promise((resolve) => {
-                    document.getElementById("opponent-progress").setAttribute("value", 25);
-                    document.getElementById("opponent-progress").setAttribute("max", 100);
+                    document.getElementById("opposition-activity").showModal();
                     val("opponent-actions", "Planning...");
                     setTimeout(() => {
-                        document.getElementById("opponent-progress").setAttribute("value",  75);
                         val("opponent-actions", "Mobilizing...");
-                        setTimeout(async () => {
-                            document.getElementById("opponent-progress").removeAttribute("value");
-                            document.getElementById("opponent-progress").removeAttribute("max");
-                            val("opponent-actions", "Unknown...");
+                        setTimeout(() => {
+                            val("opponent-actions", "Ready!");
                             this.opponentForces = Math.floor(Math.random() * val("opponent-remaining-forces"));
-                            resolve();
-                        }, 500)
+                            setTimeout(() => {
+                                document.getElementById("opposition-activity").close();
+                                resolve();
+                            }, 1000);
+                        }, 1000)
                     }, 1000);
                 });
             },
@@ -228,9 +230,8 @@
                     } else {
                         alert("The engagement ended in a draw.");
                     }
-                    // Reset the game state
-                    window.location.search = "";
 
+                    window.location.search = "";
                 }
             },
             setUpPlayerCommitForces: async () => {

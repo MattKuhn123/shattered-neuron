@@ -6,6 +6,7 @@
     --bgr-color-000: white;
     --bgr-color-100: snow;
     --bgr-color-200: ghostwhite;
+    --bgr-color-900: black;
 }
 
 dialog::backdrop {
@@ -14,7 +15,13 @@ dialog::backdrop {
 
 body {
     font-family: sans-serif;
+    color: var(--txt-color-000);
     background-color: var(--bgr-color-000);
+}
+
+dialog {
+    font-family: sans-serif;
+    color: var(--txt-color-000);
 }
 
 button {
@@ -48,7 +55,8 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 mark {
-    background-color: var(--acc-color-000);
+    color: var(--acc-color-000);
+    background-color: unset;
     padding: 1px 1px;
     border-radius: 1px;
 }
@@ -74,7 +82,7 @@ progress {
 .input {
     padding: 6px 6px;
     margin: 8px 0px;
-    border: 1px solid var(--acc-color-000);
+    border: 1px solid var(--bgr-color-900);
     border-radius: 3px;
     display: block;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
@@ -88,9 +96,26 @@ progress {
     color: var(--txt-color-200);
 }
 
+.btn {
+    padding: 6px 6px;
+    margin: 8px 0px;
+    border: 1px solid var(--bgr-color-900);
+    border-radius: 3px;
+}
+
+.btn-light {
+    background-color: var(--bgr-color-100);
+    color: var(--txt-color-000);
+}
+
+.btn-dark {
+    background-color: var(--bgr-color-900);
+    color: var(--txt-color-000);
+}
+
 
 .table tbody tr td {
     padding: 8px;
-    border-bottom: 1px solid var(--acc-color-000);
+    border-bottom: 1px solid var(--bgr-color-900);
     text-align: center;
 }
